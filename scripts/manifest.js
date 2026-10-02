@@ -14,7 +14,7 @@ const { execSync } = require('child_process');
 const file = process.env.CLAUDE_SETUP_MANIFEST || path.join(os.homedir(), '.claude', '.claude-setup.json');
 const [cmd, id, ...rest] = process.argv.slice(2);
 
-let m = { version: 1, repo: 'DanielEscobar19/claude-setup', commit: null, updatedAt: null, installed: {} };
+let m = { version: 1, repo: 'DanielEscobar19/agent-setup', commit: null, updatedAt: null, installed: {} };
 try { m = { ...m, ...JSON.parse(fs.readFileSync(file, 'utf8')) }; } catch { /* new manifest */ }
 
 function flag(name) { const i = rest.indexOf(name); return i >= 0 ? rest[i + 1] : undefined; }

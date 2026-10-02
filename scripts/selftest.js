@@ -31,7 +31,7 @@ const bad = jsonFiles.filter((f) => { try { read(f); return false; } catch { ret
 check(`all ${jsonFiles.length} JSON files parse`, bad.length === 0, bad.join(', '));
 
 // Files the setup references must exist (catches e.g. a gitignored template)
-const cat = read(path.join(root, 'plugins', 'catalog.json'));
+const cat = read(path.join(root, 'claude', 'plugins', 'catalog.json'));
 const refs = [
   ...cat.optionalHooks.flatMap((h) => [h.file, ...(h.scripts || [])]),
   ...cat.optionalSkills.map((s) => s.dir),
@@ -42,25 +42,32 @@ check('every file in catalog.json exists', missing.length === 0, missing.join(',
 const ignored = spawnSync('git', ['check-ignore', ...refs], { cwd: root, encoding: 'utf8' }).stdout.trim();
 check('no catalog file is git-ignored', ignored === '', ignored);
 
+// generated files are in sync with shared/
+const build = run('scripts/build.js', ['--check']);
+check('generated files are up to date (node scripts/build.js)', build.status === 0, build.stderr.trim());
+const cop = path.join(root, 'copilot', 'templates', 'agents');
+const badAgents = fs.readdirSync(cop).filter((n) => !/^---\nname: [\w-]+\ndescription: ".+"\ntools: \[.*\]\n---\n/.test(fs.readFileSync(path.join(cop, n), 'utf8').replace(/\r\n/g, '\n')));
+check('copilot agents have valid frontmatter', badAgents.length === 0, badAgents.join(', '));
+
 // merge-settings: add, idempotent, conflict kept, placeholder error
 const ws = path.join(tmp, 'ws', '.claude');
 fs.mkdirSync(ws, { recursive: true });
 const target = path.join(ws, 'settings.json');
 fs.writeFileSync(target, JSON.stringify({ model: 'opus' }));
-const hooksSrc = path.join(root, 'hooks', 'qmd-tracking.json');
+const hooksSrc = path.join(root, 'claude', 'hooks', 'qmd-tracking.json');
 let r = run('scripts/merge-settings.js', ['--target', target, '--source', hooksSrc]);
 check('merge adds hooks', r.status === 0 && read(target).hooks?.Stop?.length === 1, r.stderr);
 r = run('scripts/merge-settings.js', ['--target', target, '--source', hooksSrc]);
 check('merge is idempotent', JSON.parse(r.stdout).changed === false);
 check('_note keys are stripped', !fs.readFileSync(target, 'utf8').includes('_note'));
-r = run('scripts/merge-settings.js', ['--target', target, '--source', path.join(root, 'global', 'settings.base.json')]);
+r = run('scripts/merge-settings.js', ['--target', target, '--source', path.join(root, 'claude', 'global', 'settings.base.json')]);
 const out = JSON.parse(r.stdout);
 check('scalar conflict is kept and reported', read(target).model === 'opus' && out.conflicts.some((c) => c.startsWith('model')));
 fs.writeFileSync(path.join(tmp, 'ph.json'), JSON.stringify({ x: '<MISSING_VAR>' }));
 r = run('scripts/merge-settings.js', ['--target', target, '--source', path.join(tmp, 'ph.json')]);
 check('unresolved placeholder exits 2', r.status === 2);
 const perm = path.join(ws, 'settings.local.json');
-r = run('scripts/merge-settings.js', ['--target', perm, '--source', path.join(root, 'templates', 'permissions.local.json')]);
+r = run('scripts/merge-settings.js', ['--target', perm, '--source', path.join(root, 'claude', 'templates', 'permissions.local.json')]);
 check('permissions snippet merges', r.status === 0 && read(perm).permissions.allow.length > 0, r.stderr);
 
 // manifest

@@ -1,0 +1,46 @@
+{
+  "_note": "All paths are relative to the repo root.",
+  "marketplaces": [
+    { "name": "claude-plugins-official", "repo": "anthropics/claude-plugins-official", "note": "Official marketplace; usually pre-registered. Browse with /plugin." },
+    { "name": "qmd", "repo": "tobi/qmd" }
+  ],
+  "items": [
+    {
+      "id": "qmd",
+      "kind": "plugin",
+      "title": "QMD - local markdown/code search (MCP)",
+      "description": "Local BM25 + vector search over indexed folders, exposed as an MCP server and skill. Lets agents search a codebase semantically.",
+      "install": ["npm install -g @tobilu/qmd", "claude plugin marketplace add tobi/qmd", "claude plugin install qmd@qmd"],
+      "requires": ["node/npm"],
+      "details": "claude/plugins/qmd/README.md",
+      "hooks": ["claude/hooks/qmd-tracking.json"]
+    },
+    {
+      "id": "rtk",
+      "kind": "cli+hook",
+      "title": "RTK - Rust Token Killer",
+      "description": "CLI proxy that compresses Bash output to save tokens. A PreToolUse hook rewrites commands transparently.",
+      "install": ["winget install rtk-ai.rtk (Windows)", "rtk init --global --auto-patch"],
+      "requires": ["rtk binary on PATH"],
+      "details": "claude/plugins/rtk/README.md",
+      "hooks": ["claude/hooks/rtk.json (fallback if rtk init does not patch settings)"],
+      "globalFiles": ["claude/global/RTK.md (fallback)"]
+    }
+  ],
+  "optionalHooks": [
+    { "id": "no-claude-attribution", "file": "claude/hooks/block-claude-in-commits.json", "scripts": ["scripts/hooks/block-claude-in-commits.js"], "scope": "workspace", "description": "Blocks commits whose command or message mention Claude or Anthropic. Use in workspaces where that is unwanted." },
+    { "id": "backlog-reminder", "file": "claude/hooks/backlog-reminder.json", "scripts": ["scripts/hooks/backlog-reminder.js"], "scope": "workspace", "description": "At the end of each turn, reminds Claude to update .claude/plans/backlog.md." },
+    { "id": "qmd-tracking", "file": "claude/hooks/qmd-tracking.json", "scripts": ["scripts/hooks/qmd-hook.js"], "scope": "workspace", "requires": ["qmd"], "description": "Re-index QMD collections on session start, and after turns that edited files in a mapped repo." }
+  ],
+  "optionalAgents": ["junior", "mid", "senior", "planner", "researcher"],
+  "optionalSkills": [
+    { "id": "pr-description", "dir": "claude/templates/skills/pr-description", "description": "Draft PR title/description from git history and a PR template." },
+    { "id": "_skeleton", "dir": "claude/templates/skills/_skeleton", "description": "Blank skill to copy when writing a new one (install only if the user wants it)." }
+  ],
+  "extras": [
+    { "id": "global-base", "files": ["claude/global/CLAUDE.md", "claude/global/settings.base.json"], "description": "Global instructions and base settings (model, effort, notifications)." },
+    { "id": "workspace-skeleton", "dir": "claude/templates/workspace", "description": "Workspace CLAUDE.md plus .claude/plans/backlog.md task tracker." },
+    { "id": "permissions", "file": "claude/templates/permissions.local.json", "description": "Safe read-only git allowlist for settings.local.json." },
+    { "id": "seed-memories", "dir": "claude/templates/memory", "description": "Working-style preference memories." }
+  ]
+}

@@ -1,53 +1,57 @@
-# claude-setup
+# agent-setup
 
-A portable, generic Claude Code setup: global instructions, settings, hooks, a tiered agent set, skills,
-a workspace backlog convention, and a selectable plugin/tool catalog. Clone it onto a new machine or
-workspace, run Claude, and let Claude install it for you.
+A portable, generic AI coding-agent setup for **Claude Code** and **GitHub Copilot**: workspace
+conventions, tiered agents, skills/prompts, a backlog convention, and (for Claude) hooks and a selectable
+plugin catalog. Clone it onto a new machine or workspace, start your agent, and let it install the setup.
 
 ## Prerequisites
 
-- Claude Code, `git`, and Node.js 18+ (the helper scripts and QMD use it).
+- Claude Code and/or VS Code with GitHub Copilot, plus `git` and Node.js 18+ (the helper scripts and
+  QMD use it).
 - Optional: `gh` (GitHub CLI) if you'll push changes back to this repo.
 
 ## Quick start
 
 ```bash
-git clone https://github.com/DanielEscobar19/claude-setup.git
-cd claude-setup
-claude
+git clone https://github.com/DanielEscobar19/agent-setup.git
+cd agent-setup
+claude        # or open the folder in VS Code and use Copilot Chat in agent mode
 ```
 
-Then tell Claude:
+Then tell the agent:
 
-> Follow SETUP.md and install my Claude setup.
+> Follow SETUP.md and install my agent setup.
 
-Claude inspects the machine, shows the plugin/hook/agent/skill list so you pick what to install, asks
-for your workspace root, and merges (never overwrites) the config into `~/.claude` and the workspace.
+It asks which tool(s) you want, lets you pick plugins/hooks/agents/skills, asks for your workspace root,
+and merges (never overwrites) the config into your machine and workspace.
 
-## Layout
+## How it's organised
 
-| Path | Purpose |
-|---|---|
-| `SETUP.md` | Step-by-step instructions Claude follows |
-| `plugins/catalog.json` | Machine-readable list of everything installable |
-| `plugins/<name>/README.md` | Install, verify and config notes per plugin (qmd, rtk) |
-| `global/` | Files for `~/.claude/` (CLAUDE.md, base settings, RTK.md) |
-| `hooks/` | Hook snippets merged into settings.json |
-| `scripts/merge-settings.js` | Idempotent settings/hook merger (backs up, dedupes, reports conflicts) |
-| `scripts/selftest.js` | Self-test of the scripts and file references (run before installing) |
-| `scripts/manifest.js` | Records what's installed in `~/.claude/.claude-setup.json` |
-| `scripts/hooks/` | Cross-platform hook scripts (QMD tracking, commit guard, backlog reminder) |
-| `templates/agents/` | Generic junior / mid / senior / planner / researcher agents |
-| `templates/skills/` | Skill skeleton and a generic `pr-description` skill |
-| `templates/workspace/` | Workspace CLAUDE.md and `.claude/plans/backlog.md` |
-| `templates/permissions.local.json` | Optional safe git allowlist |
-| `templates/memory/` | Optional seed memories (working-style preferences) |
+One source of truth, per-tool adapters:
+
+```
+shared/    tool-neutral sources: agent roles, workspace instructions, skills, backlog template
+claude/    Claude Code installer + generated files + plugin catalog, hooks, global config, memory seeds
+copilot/   GitHub Copilot installer + generated files (instructions, agents, prompts)
+scripts/   build.js (shared -> per-tool), merge-settings.js, manifest.js, selftest.js, hook scripts
+```
+
+| Capability | Claude Code | Copilot |
+|---|---|---|
+| Workspace instructions | `CLAUDE.md` | `.github/copilot-instructions.md` |
+| Agents (junior/mid/senior/planner/researcher) | `.claude/agents/*.md` | `.github/agents/*.agent.md` |
+| PR-description workflow | skill | prompt file `/pr-description` |
+| Backlog tracker | `.claude/plans/backlog.md` | `.github/plans/backlog.md` |
+| Hooks, plugins (qmd, rtk), memory, permissions | yes | not available in Copilot |
+
+To change an agent or an instruction for every tool, edit `shared/` and run `node scripts/build.js`.
+`node scripts/selftest.js` fails if the generated files are out of date.
 
 ## Conventions it sets up
 
-- `.claude/` lives at the **workspace root**, never inside a repo.
-- Repo-level `CLAUDE.md` files are allowed but git-excluded locally (`.git/info/exclude`).
-- `.claude/plans/backlog.md` tracks small tasks and follow-ups across the workspace.
+- Agent config lives at the **workspace root**, never inside a repo.
+- Repo-level instruction files (`CLAUDE.md`, etc.) are allowed but git-excluded locally (`.git/info/exclude`).
+- A workspace backlog tracks small tasks and follow-ups.
 - Never push or open a PR without explicit confirmation.
 
 ## Rules this repo follows
