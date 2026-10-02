@@ -40,7 +40,14 @@ Ask which directory is the workspace root (default: the parent folder of the use
 - Create `<workspace>/.claude/plans/`.
 - Copy chosen agents from `templates/agents/` to `<workspace>/.claude/agents/`. If QMD was installed,
   uncomment the QMD tool hints in planner/researcher and ask which collections they should search.
-- Never put Claude hooks/settings/agents inside the individual repos.
+- Never put Claude hooks/settings/agents/skills inside the individual repos. The `.claude/` directory
+  lives only at the workspace root.
+- Repos in the workspace may each have their own `CLAUDE.md`, but those must stay local-only so they are
+  never pushed to shared repos. For every git repo under the workspace root, append `CLAUDE.md` (and
+  `.claude/` if present) to that repo's `.git/info/exclude` (create the file if missing, skip lines
+  already present). Do not edit the repo's tracked `.gitignore`. Skip any repo where `CLAUDE.md` is
+  already tracked by git, and tell the user.
+- Workspace-root folders that are not git repos need no exclusion.
 
 ## 6. Seed memories (if selected)
 Memory lives at `~/.claude/projects/<workspace-path-slug>/memory/`. The slug is the absolute workspace path

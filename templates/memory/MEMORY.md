@@ -1,3 +1,4 @@
 - [Orchestration: delegate to junior/mid, senior reviews/designs](feedback_orchestration_delegation.md) — prioritize junior/mid for implementation, senior for design/review only
 - [Never push without approval](feedback_no_push_without_approval.md) — commit locally is fine, but always confirm before git push
+- [New CLAUDE.md files go to .git/info/exclude](feedback_claude_md_local_exclude.md) — keep repo-level CLAUDE.md local-only, .claude/ at workspace root only
 - [Plans go in .claude/plans/](feedback_plans_location.md) — save planning docs to the workspace-root .claude/plans/, don't ask where
