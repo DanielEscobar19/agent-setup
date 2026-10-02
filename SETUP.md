@@ -2,6 +2,9 @@
 
 You are installing the user's portable AI-agent setup from this repo.
 
+## Step -1: first install or update?
+Run `node scripts/manifest.js list`. If it shows installed items, this is an **update**: stop here and follow `UPDATE.md` instead. Only continue below for a first install (or when the user explicitly wants a fresh install).
+
 ## Step 0: which tool(s)?
 Ask the user (AskUserQuestion, multiSelect) which tool(s) to set up on this machine:
 - **Claude Code** → follow `claude/SETUP.md` completely.

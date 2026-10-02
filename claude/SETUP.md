@@ -83,7 +83,7 @@ entry's `scripts` files there, then merge the entry's `file` into `<ws>/.claude/
 - Folders in `<ws>` that aren't git repos need nothing.
 
 ## 9. Record and verify
-- For every installed item: `node scripts/manifest.js add <id> --kind <plugin|hook|agent|skill|extra> --workspace <ws>`.
+- For every installed item (this also lets `UPDATE.md` find what to update later): `node scripts/manifest.js add <id> --kind <plugin|hook|agent|skill|extra> --workspace <ws>`.
 - Verification checklist; report each as pass/fail:
   - `~/.claude/settings.json` and `<ws>/.claude/settings.json` parse as valid JSON.
   - Each installed CLI answers (`qmd --version`, `rtk --version`/`rtk gain`).

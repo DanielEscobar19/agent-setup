@@ -22,6 +22,7 @@ to `<repo>` unless they start with `<ws>`.
 - **Agents** (`copilot/templates/agents/*.agent.md`): junior, mid, senior, planner, researcher.
 - **Prompts**: `pr-description`.
 - **Backlog** (`.github/plans/backlog.md`).
+- **Path-specific instruction skeleton** (`copilot/templates/instructions/_skeleton.instructions.md`): optional; copy it to `<ws>/.github/instructions/<name>.instructions.md` only if the user wants scoped rules, and set `applyTo` with them.
 - Workspace root `<ws>` (default suggestion: the parent folder of the user's repos).
 
 ## 3. Install into `<ws>/.github/`
@@ -49,9 +50,10 @@ to `<repo>` unless they start with `<ws>`.
 - Tell the user to reload the VS Code window, then check that the agents appear in the Copilot chat agent
   picker and `/pr-description` appears in the slash menu. These checks need the real editor; say so if
   you can't run them.
+- Record each installed item: `node scripts/manifest.js add <id> --kind <agent|prompt|extra> --workspace <ws>` (ids such as `copilot-agent-junior`, `copilot-instructions`, `copilot-prompt-pr-description`). Updates depend on this.
 - Do not commit or push anything unless asked.
 
 ## Notes
 - Copilot agent/prompt file formats change between releases. If a file isn't picked up, check GitHub's
   current docs for custom agents and prompt files, then update the generator in `scripts/build.js`.
-- Not generated yet: path-specific `.github/instructions/*.instructions.md` (needs `applyTo` globs).
+- Path-specific `.github/instructions/*.instructions.md` files are not generated: they hold rules for specific languages or folders, and this generic setup has none. Only a skeleton is provided.

@@ -47,6 +47,7 @@ const build = run('scripts/build.js', ['--check']);
 check('generated files are up to date (node scripts/build.js)', build.status === 0, build.stderr.trim());
 const cop = path.join(root, 'copilot', 'templates', 'agents');
 const badAgents = fs.readdirSync(cop).filter((n) => !/^---\nname: [\w-]+\ndescription: ".+"\ntools: \[.*\]\n---\n/.test(fs.readFileSync(path.join(cop, n), 'utf8').replace(/\r\n/g, '\n')));
+check('copilot instruction skeleton exists', fs.existsSync(path.join(root, 'copilot', 'templates', 'instructions', '_skeleton.instructions.md')));
 check('copilot agents have valid frontmatter', badAgents.length === 0, badAgents.join(', '));
 
 // merge-settings: add, idempotent, conflict kept, placeholder error
@@ -75,6 +76,14 @@ const manifestEnv = { CLAUDE_SETUP_MANIFEST: path.join(tmp, 'm.json') };
 run('scripts/manifest.js', ['add', 'qmd', '--kind', 'plugin'], '', manifestEnv);
 check('manifest has installed item', run('scripts/manifest.js', ['has', 'qmd'], '', manifestEnv).status === 0);
 check('manifest lacks other item', run('scripts/manifest.js', ['has', 'nope'], '', manifestEnv).status === 1);
+const st = JSON.parse(run('scripts/manifest.js', ['status'], '', manifestEnv).stdout || '{}');
+check('manifest status reports installed item', Array.isArray(st.items) && st.items.some((i) => i.id === 'qmd'));
+const rootCommit = spawnSync('git', ['rev-list', '--max-parents=0', 'HEAD'], { cwd: root, encoding: 'utf8' }).stdout.trim().split('\n')[0];
+if (rootCommit) {
+  fs.writeFileSync(manifestEnv.CLAUDE_SETUP_MANIFEST, JSON.stringify({ installed: { old: { kind: 'item', commit: rootCommit } } }));
+  const old = JSON.parse(run('scripts/manifest.js', ['status'], '', manifestEnv).stdout).items[0];
+  check('manifest status detects outdated item', old.upToDate === false);
+}
 
 // hook scripts
 r = run('scripts/hooks/block-claude-in-commits.js', [], JSON.stringify({ tool_input: { command: 'git commit -m "by Claude"' } }));

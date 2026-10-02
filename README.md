@@ -47,6 +47,17 @@ scripts/   build.js (shared -> per-tool), merge-settings.js, manifest.js, selfte
 To change an agent or an instruction for every tool, edit `shared/` and run `node scripts/build.js`.
 `node scripts/selftest.js` fails if the generated files are out of date.
 
+## Updating
+
+```bash
+cd agent-setup && git pull
+claude        # or Copilot Chat in agent mode
+```
+
+Then say: *"Follow UPDATE.md and update my agent setup."* It compares what you installed with what changed,
+overwrites only files you never customized, asks about the ones you edited, and never touches your backlog,
+plans, memories or local settings. See `UPDATE.md`.
+
 ## Conventions it sets up
 
 - Agent config lives at the **workspace root**, never inside a repo.
