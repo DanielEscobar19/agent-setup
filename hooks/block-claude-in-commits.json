@@ -1,0 +1,19 @@
+{
+  "_note": "Windows PowerShell form. Denies commit commands whose text mentions Claude/Anthropic.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "powershell",
+            "if": "Bash(git commit *)",
+            "command": "$json = [Console]::In.ReadToEnd() | ConvertFrom-Json; $c = $json.tool_input.command; if ($c -match '(?i)claude|anthropic') { $r = @{hookSpecificOutput=@{hookEventName='PreToolUse';permissionDecision='deny';permissionDecisionReason='Commit blocked: message mentions Claude or Anthropic.'}}; $r | ConvertTo-Json -Depth 5 -Compress }",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

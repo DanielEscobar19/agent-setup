@@ -1,0 +1,34 @@
+{
+  "marketplaces": [
+    { "name": "claude-plugins-official", "repo": "anthropics/claude-plugins-official", "note": "Official marketplace; usually pre-registered. Browse with /plugin." },
+    { "name": "qmd", "repo": "tobi/qmd" }
+  ],
+  "items": [
+    {
+      "id": "qmd",
+      "kind": "plugin",
+      "title": "QMD - local markdown/code search (MCP)",
+      "description": "Local BM25 + vector search over indexed folders, exposed as an MCP server and skill. Lets agents search a codebase semantically.",
+      "install": ["claude plugin marketplace add tobi/qmd", "claude plugin install qmd@qmd"],
+      "requires": ["node/npm", "qmd CLI on PATH"],
+      "details": "plugins/qmd/README.md",
+      "hooks": ["hooks/qmd-reindex.json"]
+    },
+    {
+      "id": "rtk",
+      "kind": "cli+hook",
+      "title": "RTK - Rust Token Killer",
+      "description": "CLI proxy that compresses Bash output to save tokens. A PreToolUse hook rewrites commands transparently.",
+      "install": ["see plugins/rtk/README.md"],
+      "requires": ["rtk binary on PATH"],
+      "details": "plugins/rtk/README.md",
+      "hooks": ["hooks/rtk.json"],
+      "globalFiles": ["global/RTK.md"]
+    }
+  ],
+  "optionalHooks": [
+    { "id": "no-claude-attribution", "file": "hooks/block-claude-in-commits.json", "description": "Blocks commits whose command or message mention Claude or Anthropic. Use in workspaces where that is unwanted." },
+    { "id": "qmd-reindex", "file": "hooks/qmd-reindex.json", "description": "Re-index QMD collections on session start." }
+  ],
+  "optionalAgents": ["junior", "mid", "senior", "planner", "researcher"]
+}

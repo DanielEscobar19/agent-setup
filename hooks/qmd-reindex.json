@@ -1,0 +1,17 @@
+{
+  "_note": "Replace <COLLECTIONS> with comma-separated QMD collection names. Windows PowerShell form; on macOS/Linux use a bash command running qmd update then qmd embed in the background.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "powershell",
+            "command": "Start-Process powershell -ArgumentList '-NoProfile','-Command','qmd update -c <COLLECTIONS>; qmd embed -c <COLLECTIONS>' -WindowStyle Hidden",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  }
+}
