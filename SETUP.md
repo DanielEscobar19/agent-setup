@@ -16,6 +16,8 @@ adapted.
 - OS and shell; availability of `node` (18+), `npm`, `git`, `gh`, and `winget`/`brew`/`apt`.
   If Node is missing, stop and ask the user to install it (the scripts need it).
 - What exists: `~/.claude/settings.json`, `~/.claude/CLAUDE.md`, `~/.claude/plugins/installed_plugins.json`.
+- `node <repo>/scripts/selftest.js` — checks that this repo's scripts and files work on this machine. If
+  any check fails, stop and tell the user before installing anything.
 - `node <repo>/scripts/manifest.js list` — what a previous run already installed (skip those unless the
   user wants a reinstall).
 - Whether `qmd` and `rtk` are already on PATH.

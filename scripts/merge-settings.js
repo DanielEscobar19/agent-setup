@@ -103,7 +103,7 @@ merge(target, source, []);
 const changed = JSON.stringify(target) !== before;
 if (changed && !opt.dry) {
   fs.mkdirSync(path.dirname(path.resolve(opt.target)), { recursive: true });
-  if (exists) fs.copyFileSync(opt.target, `${opt.target}.bak-${Date.now()}`);
+  if (exists && fs.statSync(opt.target).size > 0) fs.copyFileSync(opt.target, `${opt.target}.bak-${Date.now()}`);
   fs.writeFileSync(opt.target, JSON.stringify(target, null, 2) + '\n');
 }
 console.log(JSON.stringify({ target: opt.target, dryRun: opt.dry, changed, ...log }, null, 2));

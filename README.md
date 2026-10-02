@@ -34,6 +34,7 @@ for your workspace root, and merges (never overwrites) the config into `~/.claud
 | `global/` | Files for `~/.claude/` (CLAUDE.md, base settings, RTK.md) |
 | `hooks/` | Hook snippets merged into settings.json |
 | `scripts/merge-settings.js` | Idempotent settings/hook merger (backs up, dedupes, reports conflicts) |
+| `scripts/selftest.js` | Self-test of the scripts and file references (run before installing) |
 | `scripts/manifest.js` | Records what's installed in `~/.claude/.claude-setup.json` |
 | `scripts/hooks/` | Cross-platform hook scripts (QMD tracking, commit guard, backlog reminder) |
 | `templates/agents/` | Generic junior / mid / senior / planner / researcher agents |

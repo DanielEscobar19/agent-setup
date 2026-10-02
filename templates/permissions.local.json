@@ -1,0 +1,13 @@
+{
+  "_note": "Optional safe allowlist. Merge into <workspace>/.claude/settings.local.json (personal, not shared). Read-only git plus stash; extend as you go.",
+  "permissions": {
+    "allow": [
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git show *)",
+      "Bash(git branch *)",
+      "Bash(git stash *)"
+    ]
+  }
+}
