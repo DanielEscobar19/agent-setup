@@ -42,6 +42,11 @@ Ask which directory is the workspace root (default: the parent folder of the use
   uncomment the QMD tool hints in planner/researcher and ask which collections they should search.
 - Never put Claude hooks/settings/agents/skills inside the individual repos. The `.claude/` directory
   lives only at the workspace root.
+- **Optional: init each repo.** List the git repos directly under the workspace root and ask (multiSelect)
+  which ones should get a repo-level `CLAUDE.md`. For each selected repo that lacks one, run the `init`
+  skill with that repo as the working directory (it documents the codebase: build/test commands,
+  architecture). Skip repos that already have a `CLAUDE.md`. Always run the exclusion step below right
+  after, before the user can commit anything.
 - Repos in the workspace may each have their own `CLAUDE.md`, but those must stay local-only so they are
   never pushed to shared repos. For every git repo under the workspace root, append `CLAUDE.md` (and
   `.claude/` if present) to that repo's `.git/info/exclude` (create the file if missing, skip lines
