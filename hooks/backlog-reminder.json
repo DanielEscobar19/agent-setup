@@ -1,0 +1,8 @@
+{
+  "_note": "Workspace hook. Needs scripts/hooks/backlog-reminder.js copied to <workspace>/.claude/scripts/.",
+  "hooks": {
+    "Stop": [
+      { "hooks": [ { "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/.claude/scripts/backlog-reminder.js\"", "timeout": 10 } ] }
+    ]
+  }
+}

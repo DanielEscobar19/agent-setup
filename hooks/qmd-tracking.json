@@ -1,0 +1,14 @@
+{
+  "_note": "Workspace hooks (merge into <workspace>/.claude/settings.json). Needs scripts/hooks/qmd-hook.js copied to <workspace>/.claude/scripts/ and a <workspace>/.claude/qmd-map.json mapping repo folder -> QMD collection.",
+  "hooks": {
+    "SessionStart": [
+      { "hooks": [ { "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/.claude/scripts/qmd-hook.js\" session", "timeout": 15 } ] }
+    ],
+    "PostToolUse": [
+      { "matcher": "Write|Edit", "hooks": [ { "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/.claude/scripts/qmd-hook.js\" mark", "timeout": 10 } ] }
+    ],
+    "Stop": [
+      { "hooks": [ { "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/.claude/scripts/qmd-hook.js\" reindex", "timeout": 15 } ] }
+    ]
+  }
+}
