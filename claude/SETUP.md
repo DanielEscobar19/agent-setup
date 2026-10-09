@@ -60,6 +60,7 @@ entry's `scripts` files there, then merge the entry's `file` into `<ws>/.claude/
 
 ## 7. Workspace (if `workspace-skeleton`, agents or skills were selected)
 - Copy `claude/templates/workspace/CLAUDE.md` to `<ws>/CLAUDE.md` (append missing sections if one exists).
+- **Workspace README** (`workspace-readme` extra): see step 8b. Do not put it inside `.claude/`.
 - Copy `claude/templates/workspace/.claude/plans/backlog.md` to `<ws>/.claude/plans/backlog.md` (skip if
   it exists).
 - Copy chosen agents from `claude/templates/agents/` to `<ws>/.claude/agents/`. If QMD is installed, add
@@ -82,6 +83,16 @@ entry's `scripts` files there, then merge the entry's `file` into `<ws>/.claude/
   `.gitignore` files. If `CLAUDE.md` is already tracked by git, skip that repo and tell the user.
 - Folders in `<ws>` that aren't git repos need nothing.
 
+## 8b. Workspace README (if `workspace-readme` was selected)
+`<ws>/README.md` is for the developer, not the agent, so it lives at the workspace root (never inside
+`.claude/` or any repo).
+- Copy `shared/templates/workspace-readme.md` to `<ws>/README.md`. If one exists, only append the
+  missing sections; never rewrite the user's text.
+- Fill the table between the `repos:start`/`repos:end` markers: one row per git repo directly under `<ws>`.
+  Read each repo's `package.json`, `pyproject.toml`, `Makefile` or README for install/run/test commands.
+  Leave a cell empty rather than guessing, show the result to the user, and ask about gaps.
+- If `<ws>` is itself a git repo, add `README.md` to its `.git/info/exclude` (it holds personal notes).
+
 ## 9. Record and verify
 - For every installed item (this also lets `UPDATE.md` find what to update later): `node scripts/manifest.js add <id> --kind <plugin|hook|agent|skill|extra> --workspace <ws>`.
 - Verification checklist; report each as pass/fail:
@@ -89,6 +100,7 @@ entry's `scripts` files there, then merge the entry's `file` into `<ws>/.claude/
   - Each installed CLI answers (`qmd --version`, `rtk --version`/`rtk gain`).
   - `<ws>/.claude/` contains the expected agents/skills/scripts; no `.claude/` inside any repo.
   - Each repo's `CLAUDE.md` is untracked and listed in its `.git/info/exclude` (`git status` is clean of it).
+  - `<ws>/README.md` exists at the workspace root (not in `.claude/` or any repo) if selected.
   - Hook scripts run: pipe `{}` into `node <ws>/.claude/scripts/<script>.js ...`; it must exit 0.
 - Summarize what was installed, skipped, and any manual follow-ups. Tell the user to restart Claude Code
   (or run `/reload-plugins`) so plugins and hooks load.

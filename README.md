@@ -42,6 +42,7 @@ scripts/   build.js (shared -> per-tool), merge-settings.js, manifest.js, selfte
 | Agents (junior/mid/senior/planner/researcher) | `.claude/agents/*.md` | `.github/agents/*.agent.md` |
 | PR-description workflow | skill | prompt file `/pr-description` |
 | Backlog tracker | `.claude/plans/backlog.md` | `.github/plans/backlog.md` |
+| Workspace README (dev notes, run table) | `<ws>/README.md` | `<ws>/README.md` |
 | Hooks, plugins (qmd, rtk), memory, permissions | yes | not available in Copilot |
 
 To change an agent or an instruction for every tool, edit `shared/` and run `node scripts/build.js`.

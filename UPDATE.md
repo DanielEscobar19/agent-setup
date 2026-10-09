@@ -34,6 +34,7 @@ Installed copy ↔ repo source (the repo side is generated from `shared/`):
 | `<ws>/.claude/agents/<n>.md` | `claude/templates/agents/<n>.md` |
 | `<ws>/.claude/skills/<n>/` | `claude/templates/skills/<n>/` |
 | `<ws>/CLAUDE.md` | `claude/templates/workspace/CLAUDE.md` |
+| `<ws>/README.md` | `shared/templates/workspace-readme.md` (only the section structure; see below) |
 | `<ws>/.claude/scripts/<s>.js` | `scripts/hooks/<s>.js` |
 | `<ws>/.github/agents/<n>.agent.md` | `copilot/templates/agents/<n>.agent.md` |
 | `<ws>/.github/prompts/*` | `copilot/templates/workspace/.github/prompts/*` |
@@ -52,7 +53,7 @@ For each file whose source changed since the recorded commit:
 4. Plugins/tools (qmd, rtk): only act if `claude/plugins/<id>/README.md` or the catalog entry changed;
    follow the changed steps, don't reinstall what already works.
 
-**Never touch** user-owned content: `<ws>/.claude/plans/backlog.md` and other plans,
+**Never touch** user-owned content: `<ws>/README.md` (at most refresh the table between the `repos:start`/`repos:end` markers after asking, and mention new template sections), `<ws>/.claude/plans/backlog.md` and other plans,
 `<ws>/.claude/qmd-map.json`, memories, `settings.local.json`, repo-level `CLAUDE.md` files. If the
 backlog *template* gained a new section, mention it and let the user decide.
 

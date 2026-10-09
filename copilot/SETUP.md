@@ -22,6 +22,7 @@ to `<repo>` unless they start with `<ws>`.
 - **Agents** (`copilot/templates/agents/*.agent.md`): junior, mid, senior, planner, researcher.
 - **Prompts**: `pr-description`.
 - **Backlog** (`.github/plans/backlog.md`).
+- **Workspace README** (`<ws>/README.md`, shared with Claude): follow step 8b of `claude/SETUP.md`; skip if it already exists.
 - **Path-specific instruction skeleton** (`copilot/templates/instructions/_skeleton.instructions.md`): optional; copy it to `<ws>/.github/instructions/<name>.instructions.md` only if the user wants scoped rules, and set `applyTo` with them.
 - Workspace root `<ws>` (default suggestion: the parent folder of the user's repos).
 
