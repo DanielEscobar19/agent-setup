@@ -21,7 +21,11 @@ const safe = (c) => /^[\w.-]+$/.test(c);
 function reindex(cols) {
   const list = [...new Set(cols)].filter(safe).join(',');
   if (!list) return;
-  spawn(`qmd update -c ${list} && qmd embed -c ${list}`, { shell: true, detached: true, stdio: 'ignore', windowsHide: true }).unref();
+  // On Windows, `detached: true` makes the child DETACHED_PROCESS, which overrides windowsHide:
+  // cmd.exe then gets no console and every console child (qmd -> node) opens its own visible window.
+  // Without `detached`, windowsHide gives CREATE_NO_WINDOW and the whole chain stays hidden.
+  const win = process.platform === 'win32';
+  spawn(`qmd update -c ${list} && qmd embed -c ${list}`, { shell: true, detached: !win, stdio: 'ignore', windowsHide: true }).unref();
 }
 
 const mode = process.argv[2];
