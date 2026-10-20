@@ -14,5 +14,10 @@ Preview first with `rtk init --codex --global --dry-run`. Check with `rtk init -
 Without `--global`, it writes into the current project instead; run it from the workspace root only if
 the user wants it workspace-local.
 
+## Windows / PowerShell
+Codex runs commands in PowerShell on Windows. `rtk` wraps programs, not cmdlets: `rtk git status` works, `rtk Get-ChildItem`
+fails. `codex/global/AGENTS.md` carries a line telling Codex this; keep it when merging into `~/.codex/AGENTS.md`.
+For a cmdlet that must go through rtk: `rtk powershell -NoProfile -Command "..."`.
+
 ## Verify
 `rtk --version`, `rtk gain`, and `~/.codex/AGENTS.md` references `RTK.md`. Restart Codex.
