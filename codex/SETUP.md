@@ -27,6 +27,7 @@ to `<repo>` unless they start with `<ws>`.
 ## 2. Let the user choose (AskUserQuestion, multiSelect)
 - **Workspace instructions** (`codex/templates/workspace/AGENTS.md`).
 - **Agents** (`codex/templates/agents/*.toml`): junior, mid, senior, planner, researcher.
+- **Agent models** (if agents are selected): see step 3, "Agent models". Ask the user to confirm the proposed mapping.
 - **Skills** (`codex/templates/skills/`): `pr-description`. `_skeleton` is a blank to copy when authoring a new skill; install it only on request.
 - **Backlog** (`.codex/plans/backlog.md`).
 - **Workspace README** (`<ws>/README.md`, shared with Claude): follow step 8b of `claude/SETUP.md`; skip if it already exists.
@@ -46,9 +47,18 @@ to `<repo>` unless they start with `<ws>`.
 - Agents → `<ws>/.codex/agents/<name>.toml`.
 - Skills → `<ws>/.agents/skills/<name>/` (copy the whole folder; don't overwrite a skill of the same name).
 - Backlog → `<ws>/.codex/plans/backlog.md` (skip if it exists).
-- Agent `model` is intentionally left out so the user's Codex config decides. `model_reasoning_effort`
-  is tiered (junior low, mid/researcher medium, senior/planner high). Subagents inherit the parent's
-  sandbox and approvals, so read-only roles are enforced by their instructions, not by a tool list.
+- The templates carry no `model` (names depend on the account and change often). `model_reasoning_effort` is tiered
+  (junior low; mid, planner and researcher medium; senior high). Subagents inherit the parent's sandbox and approvals,
+  so read-only roles are enforced by their instructions, not by a tool list.
+- **Agent models** (Claude pins haiku/sonnet/opus by tier; do the same here, with models from the user's own account):
+  1. `node scripts/codex-models.js list` shows the models this account can use (from `~/.codex/models_cache.json`; if
+     missing, ask the user to start Codex once).
+  2. Propose one model per tier and let the user change it: **fast** (junior) = the cheapest model described as fast/affordable;
+     **balanced** (mid, planner, researcher) = the current workhorse coding model; **deep** (senior) = the most capable
+     model, or the workhorse if the user prefers lower cost. Never propose a model that is not in the list.
+  3. Show the dry run, then apply:
+     `node scripts/codex-models.js apply --dir <ws>/.codex/agents --fast <m> --balanced <m> --deep <m> --dry-run`, then without `--dry-run`.
+     It inserts or replaces one `model = "..."` line per agent and is safe to re-run. Skip this step if the user wants every agent on the session model.
 - **Hooks** (only those selected):
   1. Copy the hook's script(s) from `scripts/hooks/` to `<ws>/.codex/hooks/` (`qmd-hook.js` also needs
      `<ws>/.codex/qmd-map.json`; see `codex/plugins/qmd/README.md`).
@@ -91,7 +101,7 @@ to `<repo>` unless they start with `<ws>`.
 - Copilot also reads `AGENTS.md`, so installing both tools gives Copilot this file too.
 
 ## 5. Verify
-- Each installed agent file parses as TOML and has `name`, `description` and `developer_instructions`.
+- Each installed agent file parses as TOML and has `name`, `description` and `developer_instructions`; if models were chosen, `node scripts/codex-models.js read --dir <ws>/.codex/agents` prints the tier mapping.
 - Each installed skill folder contains `SKILL.md` with `name` and `description` frontmatter.
 - `<ws>/.codex/hooks.json` parses as JSON and every script it references exists.
 - No Codex files were written inside any repo unless git-excluded.

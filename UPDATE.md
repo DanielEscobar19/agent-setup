@@ -63,6 +63,14 @@ Installed copy ↔ repo source (the repo side is generated from `shared/`):
 | `<ws>/AGENTS.md` | `codex/templates/workspace/AGENTS.md` |
 | `<ws>/.codex/hooks/<s>.js`, `<ws>/.github/hooks/scripts/<s>.js` | `scripts/hooks/<s>.js` |
 
+**Codex agent models.** Installed `<ws>/.codex/agents/<n>.toml` files may carry a `model = "..."` line that the user
+chose at install (`codex/SETUP.md` step 3); the templates have none. When comparing with the original upstream version,
+ignore that one line, so choosing models does not make the file look customized. Before overwriting any Codex agent file,
+run `node scripts/codex-models.js read --dir <ws>/.codex/agents` and save the mapping. After the files are updated, re-apply it with
+`node scripts/codex-models.js apply --dir <ws>/.codex/agents --fast .. --balanced .. --deep ..` (it validates against the
+account's models; if one is gone, propose a replacement). If agents were installed without models, offer the model step
+once as "New available" (see `codex/SETUP.md` step 3, "Agent models").
+
 For each file whose source changed since the recorded commit:
 1. Read the version the user originally got: `git show <installedCommit>:<repo-source-path>`.
 2. Compare it with the installed file:

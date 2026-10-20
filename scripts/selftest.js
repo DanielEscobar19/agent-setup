@@ -119,6 +119,20 @@ cq({ tool_name: 'Read', tool_input: { file_path: '/x/my-api/a.ts' } });
 check('qmd-hook ignores non-edit tools', !fs.existsSync(path.join(cws, '.qmd-dirty-my-api')));
 cq({ tool_name: 'Edit', cwd: '/x/my-api', tool_input: { file_path: 'src/b.ts' } });
 check('qmd-hook uses cwd for relative edit paths', fs.existsSync(path.join(cws, '.qmd-dirty-my-api')));
+// codex-models: inserts, is idempotent, reads back, rejects unknown models
+const ma = path.join(tmp, 'agents');
+fs.mkdirSync(ma);
+for (const f of fs.readdirSync(cdx)) fs.copyFileSync(path.join(cdx, f), path.join(ma, f));
+const mh = { CODEX_HOME: path.join(tmp, 'codexhome') };
+fs.mkdirSync(mh.CODEX_HOME);
+fs.writeFileSync(path.join(mh.CODEX_HOME, 'models_cache.json'), JSON.stringify({ models: [{ slug: 'm-fast', visibility: 'list' }, { slug: 'm-mid', visibility: 'list' }, { slug: 'm-deep', visibility: 'list' }, { slug: 'm-hidden', visibility: 'hide' }] }));
+const mArgs = ['apply', '--dir', ma, '--fast', 'm-fast', '--balanced', 'm-mid', '--deep', 'm-deep'];
+r = run('scripts/codex-models.js', mArgs, '', mh);
+check('codex-models applies a model per tier', r.status === 0 && JSON.parse(r.stdout).changed.length === 5, r.stderr);
+check('codex-models is idempotent', JSON.parse(run('scripts/codex-models.js', mArgs, '', mh).stdout).changed.length === 0);
+check('codex-models reads the mapping back', run('scripts/codex-models.js', ['read', '--dir', ma], '', mh).stdout.trim() === JSON.stringify({ fast: 'm-fast', balanced: 'm-mid', deep: 'm-deep' }));
+check('codex-models rejects unavailable or hidden models', run('scripts/codex-models.js', ['apply', '--dir', ma, '--fast', 'm-hidden'], '', mh).status === 2);
+check('codex-models keeps one model line per agent', fs.readdirSync(ma).every((n) => (fs.readFileSync(path.join(ma, n), 'utf8').match(/^model\s*=/gm) || []).length === 1));
 // hook snippets: Codex ones merge with a placeholder var; Copilot ones are flat per-hook files
 for (const f of fs.readdirSync(path.join(root, 'codex', 'hooks'))) {
   const t = path.join(tmp, 'codex-hooks.json');
