@@ -1,0 +1,7 @@
+{
+  "hooks": {
+    "Stop": [
+      { "type": "command", "command": "node \"<WS>/.github/hooks/scripts/backlog-reminder.js\" .github/plans/backlog.md", "timeout": 10 }
+    ]
+  }
+}

@@ -8,4 +8,5 @@ Edit skills here, then run `node scripts/build.js` to regenerate the per-tool co
 
 How each tool consumes them:
 - **Claude Code:** copied to `<workspace>/.claude/skills/<name>/` (needs `SKILL.md`).
+- **Codex:** copied to `<workspace>/.agents/skills/<name>/` (same `SKILL.md` format as Claude).
 - **Copilot:** `pr-description` becomes a prompt file `.github/prompts/pr-description.prompt.md`.

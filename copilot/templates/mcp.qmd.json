@@ -1,0 +1,6 @@
+{
+  "_note": "Merge into <workspace>/.vscode/mcp.json (VS Code uses 'servers', not 'mcpServers').",
+  "servers": {
+    "qmd": { "type": "stdio", "command": "qmd", "args": ["mcp"] }
+  }
+}

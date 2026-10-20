@@ -6,7 +6,7 @@ files up to date **without** clobbering the user's local changes.
 ## For the user (two commands)
 ```bash
 cd agent-setup && git pull
-claude        # or Copilot Chat in agent mode
+claude        # or codex, or Copilot Chat in agent mode
 ```
 Then say: **"Follow UPDATE.md and update my agent setup."**
 
@@ -23,8 +23,8 @@ Then say: **"Follow UPDATE.md and update my agent setup."**
 - `git log --oneline <installedCommit>..HEAD` for the human-readable summary. Show the user a short
   digest of what's new before changing anything.
 - Also look for items that exist now but were never installed (new agents, hooks, plugins, skills in
-  `claude/plugins/catalog.json`, `copilot/templates/`). List them as "New available" and ask which to add.
-  Use `claude/SETUP.md` / `copilot/SETUP.md` to install those.
+  `claude/plugins/catalog.json`, `copilot/templates/`, `codex/templates/`). List them as "New available" and ask which to add.
+  Use `claude/SETUP.md` / `copilot/SETUP.md` / `codex/SETUP.md` to install those.
 
 ### 3. Update each installed item
 Installed copy ↔ repo source (the repo side is generated from `shared/`):
@@ -39,6 +39,10 @@ Installed copy ↔ repo source (the repo side is generated from `shared/`):
 | `<ws>/.github/agents/<n>.agent.md` | `copilot/templates/agents/<n>.agent.md` |
 | `<ws>/.github/prompts/*` | `copilot/templates/workspace/.github/prompts/*` |
 | `<ws>/.github/copilot-instructions.md` | `copilot/templates/workspace/.github/copilot-instructions.md` |
+| `<ws>/.codex/agents/<n>.toml` | `codex/templates/agents/<n>.toml` |
+| `<ws>/.agents/skills/<n>/` | `codex/templates/skills/<n>/` |
+| `<ws>/AGENTS.md` | `codex/templates/workspace/AGENTS.md` |
+| `<ws>/.codex/hooks/<s>.js`, `<ws>/.github/hooks/scripts/<s>.js` | `scripts/hooks/<s>.js` |
 
 For each file whose source changed since the recorded commit:
 1. Read the version the user originally got: `git show <installedCommit>:<repo-source-path>`.
@@ -60,8 +64,8 @@ backlog *template* gained a new section, mention it and let the user decide.
 ### 4. Record and verify
 - `node scripts/manifest.js add <id> --kind <kind> --workspace <ws>` for every item handled, so the
   next update starts from the new commit.
-- Re-run the verification checklist from `claude/SETUP.md` step 9 (Claude) or `copilot/SETUP.md` step 5.
-- Tell the user to restart Claude Code (or reload the VS Code window).
+- Re-run the verification checklist from `claude/SETUP.md` step 9 (Claude), `copilot/SETUP.md` step 5 or `codex/SETUP.md` step 5.
+- Tell the user to restart Claude Code or Codex (or reload the VS Code window).
 - Do not commit or push anything unless asked.
 
 ## Updating from the first layout (before commit `f460842`)

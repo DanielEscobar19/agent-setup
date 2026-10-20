@@ -1,0 +1,6 @@
+# Base settings (mirrors claude/global/settings.base.json). Add only the keys that are missing from
+# ~/.codex/config.toml; never change a value the user already set. Top-level keys must stay above any [table].
+model_reasoning_effort = "medium"
+
+[tui]
+notifications = ["agent-turn-complete", "approval-requested"]

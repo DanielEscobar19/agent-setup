@@ -1,0 +1,13 @@
+{
+  "_note": "Workspace hook. Merge into <workspace>/.codex/hooks.json with merge-settings.js --var WS=<workspace>. Needs scripts/hooks/block-claude-in-commits.js copied to <workspace>/.codex/hooks/. Codex hooks must be trusted once via /hooks.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "command": "node \"<WS>/.codex/hooks/block-claude-in-commits.js\"", "timeout": 10, "statusMessage": "Checking commit message" }
+        ]
+      }
+    ]
+  }
+}

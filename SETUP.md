@@ -9,8 +9,9 @@ Run `node scripts/manifest.js list`. If it shows installed items, this is an **u
 Ask the user (AskUserQuestion, multiSelect) which tool(s) to set up on this machine:
 - **Claude Code** → follow `claude/SETUP.md` completely.
 - **GitHub Copilot** → follow `copilot/SETUP.md` completely.
+- **OpenAI Codex** → follow `codex/SETUP.md` completely.
 
-If they pick both, do Claude first, then Copilot, and reuse the same workspace root. Don't repeat the
+If they pick several, do Claude first, then Copilot, then Codex, and reuse the same workspace root. Don't repeat the
 questions both flows share (workspace root, repo list).
 
 Rules for every flow:
@@ -20,7 +21,7 @@ Rules for every flow:
 
 ## How this repo is organised
 - `shared/` — tool-neutral sources of truth: agent roles, workspace instructions, skills, backlog template.
-- `claude/`, `copilot/` — per-tool installers plus **generated** files built from `shared/`.
+- `claude/`, `copilot/`, `codex/` — per-tool installers plus **generated** files built from `shared/`.
 - `scripts/build.js` regenerates the per-tool files; `scripts/selftest.js` verifies everything.
 
 To change an agent or an instruction for all tools, edit `shared/` and run `node scripts/build.js`.

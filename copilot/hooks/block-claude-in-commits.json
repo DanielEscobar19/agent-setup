@@ -1,0 +1,7 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      { "type": "command", "command": "node \"<WS>/.github/hooks/scripts/block-claude-in-commits.js\"", "timeout": 10 }
+    ]
+  }
+}

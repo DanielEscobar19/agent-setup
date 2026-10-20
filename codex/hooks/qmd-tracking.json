@@ -1,0 +1,14 @@
+{
+  "_note": "Workspace hooks. Needs scripts/hooks/qmd-hook.js copied to <workspace>/.codex/hooks/ and a <workspace>/.codex/qmd-map.json mapping repo folder -> QMD collection. The Write|Edit matcher also matches Codex's apply_patch.",
+  "hooks": {
+    "SessionStart": [
+      { "hooks": [ { "type": "command", "command": "node \"<WS>/.codex/hooks/qmd-hook.js\" session", "timeout": 15 } ] }
+    ],
+    "PostToolUse": [
+      { "matcher": "Write|Edit", "hooks": [ { "type": "command", "command": "node \"<WS>/.codex/hooks/qmd-hook.js\" mark", "timeout": 10 } ] }
+    ],
+    "Stop": [
+      { "hooks": [ { "type": "command", "command": "node \"<WS>/.codex/hooks/qmd-hook.js\" reindex", "timeout": 15 } ] }
+    ]
+  }
+}

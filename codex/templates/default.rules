@@ -1,0 +1,8 @@
+# Safe read-only git allowlist (mirrors claude/templates/permissions.local.json).
+# Install by appending missing rules to ~/.codex/rules/default.rules; extend as you go.
+prefix_rule(pattern = ["git", "status"], decision = "allow", match = ["git status -s"])
+prefix_rule(pattern = ["git", "diff"], decision = "allow", match = ["git diff HEAD~1"])
+prefix_rule(pattern = ["git", "log"], decision = "allow", match = ["git log --oneline"])
+prefix_rule(pattern = ["git", "show"], decision = "allow", match = ["git show HEAD"])
+prefix_rule(pattern = ["git", "branch"], decision = "allow", match = ["git branch -a"])
+prefix_rule(pattern = ["git", "stash"], decision = "allow", match = ["git stash list"])

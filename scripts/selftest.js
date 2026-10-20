@@ -47,6 +47,9 @@ const build = run('scripts/build.js', ['--check']);
 check('generated files are up to date (node scripts/build.js)', build.status === 0, build.stderr.trim());
 const cop = path.join(root, 'copilot', 'templates', 'agents');
 const badAgents = fs.readdirSync(cop).filter((n) => !/^---\nname: [\w-]+\ndescription: ".+"\ntools: \[.*\]\n---\n/.test(fs.readFileSync(path.join(cop, n), 'utf8').replace(/\r\n/g, '\n')));
+const cdx = path.join(root, 'codex', 'templates', 'agents');
+const badCodex = fs.readdirSync(cdx).filter((n) => { const t = fs.readFileSync(path.join(cdx, n), 'utf8'); return !/^name = ".+"$/m.test(t) || !/^description = ".+"$/m.test(t) || !/^developer_instructions = ".+"$/m.test(t); });
+check('codex agents have required TOML fields', badCodex.length === 0, badCodex.join(', '));
 check('copilot instruction skeleton exists', fs.existsSync(path.join(root, 'copilot', 'templates', 'instructions', '_skeleton.instructions.md')));
 check('copilot agents have valid frontmatter', badAgents.length === 0, badAgents.join(', '));
 
@@ -96,6 +99,37 @@ run('scripts/hooks/qmd-hook.js', ['mark'], JSON.stringify({ tool_input: { file_p
 check('qmd-hook marks owning collection dirty', fs.existsSync(path.join(ws, '.qmd-dirty-my-api')));
 run('scripts/hooks/qmd-hook.js', ['mark'], JSON.stringify({ tool_input: { file_path: '/x/other/a.cs' } }), hookEnv);
 check('qmd-hook ignores unmapped files', fs.readdirSync(ws).filter((f) => f.startsWith('.qmd-dirty')).length === 1);
+// commit guard works in tools that can't filter by command (Codex, Copilot) and recognises other AI attributions
+r = run('scripts/hooks/block-claude-in-commits.js', [], JSON.stringify({ tool_input: { command: 'git status # mentions claude' } }));
+check('commit guard ignores non-commit commands', r.stdout.trim() === '');
+r = run('scripts/hooks/block-claude-in-commits.js', [], JSON.stringify({ tool_input: { command: 'git commit -m "x Co-authored-by: Codex <noreply@openai.com>"' } }));
+check('commit guard denies Codex co-author line', r.stdout.includes('"deny"'));
+r = run('scripts/hooks/block-claude-in-commits.js', [], JSON.stringify({ tool_name: 'terminal', tool_input: { input: 'git commit -m "by Claude"' } }));
+check('commit guard handles unknown tool_input shape', r.stdout.includes('"deny"'));
+// qmd-hook: Codex layout (apply_patch text, config found next to the script, no CLAUDE_PROJECT_DIR)
+const cws = path.join(tmp, 'cws', '.codex');
+fs.mkdirSync(path.join(cws, 'hooks'), { recursive: true });
+fs.copyFileSync(path.join(root, 'scripts', 'hooks', 'qmd-hook.js'), path.join(cws, 'hooks', 'qmd-hook.js'));
+fs.writeFileSync(path.join(cws, 'qmd-map.json'), JSON.stringify({ 'my-api': 'my-api' }));
+const cq = (ev) => spawnSync('node', [path.join(cws, 'hooks', 'qmd-hook.js'), 'mark'], { input: JSON.stringify(ev), encoding: 'utf8', env: { ...process.env, CLAUDE_PROJECT_DIR: '' } });
+cq({ tool_name: 'apply_patch', cwd: 'C:/ws', tool_input: { command: '*** Begin Patch *** Update File: my-api/src/a.ts *** End Patch' } });
+check('qmd-hook marks collection from a Codex apply_patch', fs.existsSync(path.join(cws, '.qmd-dirty-my-api')));
+fs.rmSync(path.join(cws, '.qmd-dirty-my-api'));
+cq({ tool_name: 'Read', tool_input: { file_path: '/x/my-api/a.ts' } });
+check('qmd-hook ignores non-edit tools', !fs.existsSync(path.join(cws, '.qmd-dirty-my-api')));
+cq({ tool_name: 'Edit', cwd: '/x/my-api', tool_input: { file_path: 'src/b.ts' } });
+check('qmd-hook uses cwd for relative edit paths', fs.existsSync(path.join(cws, '.qmd-dirty-my-api')));
+// hook snippets: Codex ones merge with a placeholder var; Copilot ones are flat per-hook files
+for (const f of fs.readdirSync(path.join(root, 'codex', 'hooks'))) {
+  const t = path.join(tmp, 'codex-hooks.json');
+  r = run('scripts/merge-settings.js', ['--target', t, '--source', path.join(root, 'codex', 'hooks', f), '--var', 'WS=C:/ws']);
+  check('codex hook ' + f + ' merges', r.status === 0, r.stderr);
+}
+check('codex hooks.json has all events', ['PreToolUse', 'PostToolUse', 'Stop', 'SessionStart'].every((e) => read(path.join(tmp, 'codex-hooks.json')).hooks[e]));
+const badCop = fs.readdirSync(path.join(root, 'copilot', 'hooks')).filter((f) => !Object.values(read(path.join(root, 'copilot', 'hooks', f)).hooks).every((arr) => arr.every((h) => h.type === 'command' && h.command.includes('<WS>'))));
+check('copilot hook files are flat command entries', badCop.length === 0, badCop.join(', '));
+const rules = fs.readFileSync(path.join(root, 'codex', 'templates', 'default.rules'), 'utf8');
+check('codex rules template only allows read-only git', /prefix_rule/.test(rules) && !/"(push|commit|reset|checkout)"/.test(rules));
 check('backlog reminder emits systemMessage', run('scripts/hooks/backlog-reminder.js', []).stdout.includes('systemMessage'));
 
 fs.rmSync(tmp, { recursive: true, force: true });

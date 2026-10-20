@@ -46,7 +46,7 @@ if (cmd === 'add' && id) {
     let note = '';
     if (!v.commit) note = 'no commit recorded (installed by an older version); treat as possibly outdated';
     else if (v.commit !== now) {
-      try { changed = git(`diff --name-only ${v.commit} ${now} -- shared claude copilot scripts`).split('\n').filter(Boolean); }
+      try { changed = git(`diff --name-only ${v.commit} ${now} -- shared claude copilot codex scripts`).split('\n').filter(Boolean); }
       catch { note = 'recorded commit not in this checkout; run git fetch --unshallow or compare manually'; }
     }
     return { id: name, kind: v.kind, workspace: v.workspace, installedAt: v.commit, upToDate: !!v.commit && v.commit === now, changedFiles: changed, note };

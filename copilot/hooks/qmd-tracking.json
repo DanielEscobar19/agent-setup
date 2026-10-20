@@ -1,0 +1,13 @@
+{
+  "hooks": {
+    "SessionStart": [
+      { "type": "command", "command": "node \"<WS>/.github/hooks/scripts/qmd-hook.js\" session", "timeout": 15 }
+    ],
+    "PostToolUse": [
+      { "type": "command", "command": "node \"<WS>/.github/hooks/scripts/qmd-hook.js\" mark", "timeout": 10 }
+    ],
+    "Stop": [
+      { "type": "command", "command": "node \"<WS>/.github/hooks/scripts/qmd-hook.js\" reindex", "timeout": 15 }
+    ]
+  }
+}

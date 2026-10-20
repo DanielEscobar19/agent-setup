@@ -1,0 +1,8 @@
+{
+  "_note": "Workspace hook. Needs scripts/hooks/backlog-reminder.js copied to <workspace>/.codex/hooks/.",
+  "hooks": {
+    "Stop": [
+      { "hooks": [ { "type": "command", "command": "node \"<WS>/.codex/hooks/backlog-reminder.js\" .codex/plans/backlog.md", "timeout": 10 } ] }
+    ]
+  }
+}

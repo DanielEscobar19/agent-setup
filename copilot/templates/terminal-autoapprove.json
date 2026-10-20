@@ -1,0 +1,6 @@
+{
+  "_note": "Safe read-only git allowlist (mirrors claude/templates/permissions.local.json). Merge into <workspace>/.vscode/settings.json, or the user settings.json if the user wants it everywhere. VS Code settings files may contain comments, so merge by hand if merge-settings.js cannot parse the file.",
+  "chat.tools.terminal.autoApprove": {
+    "/^git (status|diff|log|show|branch|stash)\b/": true
+  }
+}

@@ -1,11 +1,11 @@
 #!/usr/bin/env node
-// Generates the per-tool files (Claude Code, GitHub Copilot) from the tool-neutral sources in shared/.
+// Generates the per-tool files (Claude Code, GitHub Copilot, OpenAI Codex) from the tool-neutral sources in shared/.
 //
 //   node scripts/build.js           write generated files
 //   node scripts/build.js --check   exit 1 if any generated file is out of date (used by selftest)
 //
 // Sources:   shared/agents/*.md, shared/instructions/workspace.md, shared/skills/**, shared/templates/backlog.md
-// Outputs:   claude/templates/{agents,skills,workspace}, copilot/templates/{agents,workspace}
+// Outputs:   claude/templates/{agents,skills,workspace}, copilot/templates/{agents,workspace}, codex/templates/{agents,skills,workspace}
 // Never edit the outputs by hand; edit shared/ and rebuild.
 const fs = require('fs');
 const path = require('path');
@@ -36,6 +36,12 @@ const TOOLS = {
     model: null, // Copilot model names depend on the subscription; leave to the user's model picker
     toolMap: { read: ['read', 'search'], edit: ['edit'], execute: ['execute'], web: ['web'] },
   },
+  codex: {
+    vars: { CONFIG_DIR: '.codex', PLANS_DIR: '.codex/plans', REPO_INSTRUCTIONS: 'AGENTS.md', DEFAULT_TEMPLATE: 'templates/default-template.md' },
+    // Codex agents take no tool list (they inherit the parent's sandbox); only reasoning effort is tiered.
+    // The model is left to the user's Codex config.
+    effort: { fast: 'low', balanced: 'medium', deep: 'high' },
+  },
 };
 const sub = (text, vars) => text.replace(/\{\{([A-Z_]+)\}\}/g, (m, k) => (k in vars ? vars[k] : m));
 const banner = (src) => `<!-- GENERATED from ${src} by scripts/build.js — edit the source, not this file. -->`;
@@ -62,6 +68,10 @@ for (const f of fs.readdirSync(path.join(root, 'shared', 'agents')).filter((n) =
   write(`claude/templates/agents/${f}`,
     `---\nname: ${name}\ndescription: ${meta.description}\nmodel: ${c.model[meta.tier]}\ntools: ${abstract.flatMap((t) => c.toolMap[t]).join(', ')}\n---\n${banner(src)}\n\n${body}`);
 
+  const x = TOOLS.codex;
+  write(`codex/templates/agents/${name}.toml`,
+    `# GENERATED from ${src} by scripts/build.js — edit the source, not this file.\nname = ${JSON.stringify(name)}\ndescription = ${JSON.stringify(meta.description)}\nmodel_reasoning_effort = ${JSON.stringify(x.effort[meta.tier])}\ndeveloper_instructions = ${JSON.stringify(body.trim() + '\n')}\n`);
+
   const g = TOOLS.copilot;
   const gTools = JSON.stringify([...new Set(abstract.flatMap((t) => g.toolMap[t]))]);
   write(`copilot/templates/agents/${name}.agent.md`,
@@ -77,17 +87,22 @@ write('claude/templates/workspace/.claude/plans/backlog.md', backlog);
 write('copilot/templates/workspace/.github/copilot-instructions.md',
   `# Copilot instructions\n\n${banner('shared/instructions/workspace.md')}\n\n${sub(instructions, TOOLS.copilot.vars)}`);
 write('copilot/templates/workspace/.github/plans/backlog.md', backlog);
+write('codex/templates/workspace/AGENTS.md',
+  `# AGENTS.md\n\n${banner('shared/instructions/workspace.md')}\n\n${sub(instructions, TOOLS.codex.vars)}`);
+write('codex/templates/workspace/.codex/plans/backlog.md', backlog);
 
 // ---- Skills
-// Claude: copied as-is (placeholders resolved) to claude/templates/skills/
-(function copySkills(dir, rel) {
-  for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
-    const p = path.join(dir, e.name);
-    const r = `${rel}/${e.name}`;
-    if (e.isDirectory()) copySkills(p, r);
-    else if (e.name !== 'README.md' || rel !== '') write(`claude/templates/skills${r}`, sub(fs.readFileSync(p, 'utf8').replace(/\r\n/g, '\n'), TOOLS.claude.vars));
-  }
-})(path.join(root, 'shared', 'skills'), '');
+// Claude and Codex share the SKILL.md format: copied as-is (placeholders resolved) to <tool>/templates/skills/
+for (const tool of ['claude', 'codex']) {
+  (function copySkills(dir, rel) {
+    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+      const p = path.join(dir, e.name);
+      const r = `${rel}/${e.name}`;
+      if (e.isDirectory()) copySkills(p, r);
+      else if (e.name !== 'README.md' || rel !== '') write(`${tool}/templates/skills${r}`, sub(fs.readFileSync(p, 'utf8').replace(/\r\n/g, '\n'), TOOLS[tool].vars));
+    }
+  })(path.join(root, 'shared', 'skills'), '');
+}
 
 // Copilot: pr-description -> prompt file (+ bundled default template next to it)
 {
