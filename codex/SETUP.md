@@ -85,7 +85,7 @@ to `<repo>` unless they start with `<ws>`.
 - No Codex files were written inside any repo unless git-excluded.
 - Tell the user to restart Codex from `<ws>`, trust the hooks in `/hooks`, then check that the agents are
   listed and `$pr-description` (or `/skills`) shows the skill. These checks need the real tool; say so if you can't run them.
-- RTK: `rtk gain` works and `~/.codex/AGENTS.md` references `RTK.md`. QMD: `qmd --version` works and `[mcp_servers.qmd]` is in `~/.codex/config.toml`; `/mcp` in Codex lists it.
+- RTK: `rtk gain` works, `~/.codex/AGENTS.md` references `RTK.md`, and `~/.codex/RTK.md` has the PowerShell-aware rule (not "Always prefix"). QMD: `qmd --version` works and `[mcp_servers.qmd]` is in `~/.codex/config.toml`; `/mcp` in Codex lists it.
 - Record each installed item: `node scripts/manifest.js add <id> --kind <agent|skill|hook|plugin|extra> --workspace <ws>` (ids such as `codex-agent-junior`, `codex-hook-<id>`, `codex-rtk`, `codex-qmd`, `codex-permissions`, `codex-global-base`, `codex-instructions`, `codex-skill-pr-description`). Updates depend on this.
 - Do not commit or push anything unless asked.
 

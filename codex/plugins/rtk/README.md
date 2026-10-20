@@ -19,5 +19,14 @@ Codex runs commands in PowerShell on Windows. `rtk` wraps programs, not cmdlets:
 fails. `codex/global/AGENTS.md` carries a line telling Codex this; keep it when merging into `~/.codex/AGENTS.md`.
 For a cmdlet that must go through rtk: `rtk powershell -NoProfile -Command "..."`.
 
+`rtk init --codex` writes `~/.codex/RTK.md` with the blunt rule "Always prefix shell commands with `rtk`." After every
+`rtk init` (install or update), replace that sentence in `~/.codex/RTK.md` with the three lines above:
+
+> Prefix shell commands that run a real executable with `rtk` (git, npm, cargo, dotnet, ...).
+> On Windows, PowerShell cmdlets (Get-ChildItem, Select-String, ...) are not executables: run them without `rtk`,
+> or as `rtk powershell -NoProfile -Command "..."`.
+
+rtk owns that file, so a later `rtk init` or rtk upgrade can restore the old wording; check it when updating.
+
 ## Verify
 `rtk --version`, `rtk gain`, and `~/.codex/AGENTS.md` references `RTK.md`. Restart Codex.
