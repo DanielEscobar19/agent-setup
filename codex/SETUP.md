@@ -38,6 +38,7 @@ to `<repo>` unless they start with `<ws>`.
 - **QMD** (local search, as an MCP server): `codex/plugins/qmd/README.md`. Touches `~/.codex/config.toml`.
 - **Permissions allowlist** (`codex/templates/default.rules`): safe read-only git commands. Touches `~/.codex/rules/`.
 - **Global base** (`codex/global/AGENTS.md`, `codex/global/config.base.toml`): global instructions and base settings (reasoning effort, notifications). Touches `~/.codex/`.
+- **Repo `AGENTS.md`** (optional, per repo): list the git repos directly under `<ws>` and ask (multiSelect) which should get a repo-level `AGENTS.md`.
 - Workspace root `<ws>` (default suggestion: the parent folder of the user's repos).
 
 ## 3. Install
@@ -66,6 +67,17 @@ to `<repo>` unless they start with `<ws>`.
 - **RTK / QMD** (only if selected): follow their READMEs in `codex/plugins/`. These edit the user's global
   `~/.codex/` files, so show what will change (`rtk init --codex --global --dry-run`; the TOML block)
   and merge, never overwrite. Ask before installing a missing binary.
+
+## 3b. Repos inside the workspace
+- **Optional: init each selected repo.** Codex's own `/init` creates a repo `AGENTS.md`, but it is an interactive
+  slash command that an installing agent cannot run. So either tell the user to run `/init` in Codex from that repo
+  (and wait), or write the file yourself with the same intent: read the repo (README, manifests, build/test scripts,
+  layout) and write a short `AGENTS.md` with the real build/test/run commands, structure and conventions. Show it to the
+  user before saving. Skip repos that already have one.
+- **Always, right after init (and for every repo that already has an `AGENTS.md`):** append `AGENTS.md` to that repo's
+  `.git/info/exclude` (create the file if missing, skip lines already present), and also `**/.codex/.qmd-dirty-*` if QMD
+  tracking was installed. Don't edit tracked `.gitignore` files. If `AGENTS.md` is already tracked by git, skip that repo and tell the user.
+- Folders in `<ws>` that aren't git repos need nothing.
 
 ## 4. Where the files must NOT go
 - `<ws>` is the **workspace root** (the parent of the repos), not inside any repo. Codex walks from the

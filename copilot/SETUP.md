@@ -38,6 +38,7 @@ to `<repo>` unless they start with `<ws>`.
 - **Hooks** (optional, per hook): `no-ai-attribution-in-commits` (`copilot/hooks/block-claude-in-commits.json`), `backlog-reminder` (`copilot/hooks/backlog-reminder.json`), `qmd-tracking` (`copilot/hooks/qmd-tracking.json`, requires QMD).
 - **RTK**: `copilot/plugins/rtk/README.md`. **QMD** (MCP server): `copilot/plugins/qmd/README.md`.
 - **Terminal allowlist** (`copilot/templates/terminal-autoapprove.json`): safe read-only git commands auto-approved in agent mode.
+- **Repo instructions** (optional, per repo): list the git repos directly under `<ws>` and ask (multiSelect) which should get a repo-level `.github/copilot-instructions.md`.
 - Workspace root `<ws>` (default suggestion: the parent folder of the user's repos).
 
 ## 3. Install into `<ws>/.github/`
@@ -57,6 +58,17 @@ to `<repo>` unless they start with `<ws>`.
   `scripts/merge-settings.js` cannot parse the file, add the entry by hand. Behaviour of auto-approve varies by VS Code version.
 - Agent `model:` is intentionally left out so the user's model picker decides. Tool names are Copilot
   aliases (`read`, `search`, `edit`, `execute`, `web`).
+
+## 3b. Repos inside the workspace
+- **Optional: init each selected repo.** Copilot's own generator (VS Code Chat: "Generate Chat Instructions", or `/init` in
+  Copilot CLI) writes the repo file, but an installing agent cannot drive it. So either tell the user to run it in that repo
+  (and wait), or write `<repo>/.github/copilot-instructions.md` yourself: read the repo (README, manifests, build/test
+  scripts, layout) and write a short file with the real build/test/run commands, structure and conventions. Show it to the
+  user before saving. Skip repos that already have one. If a repo has `AGENTS.md` or `CLAUDE.md`, Copilot already reads it; ask first.
+- **Always, right after init (and for every repo that already has the file):** append `.github/copilot-instructions.md` to that repo's
+  `.git/info/exclude` (create it if missing, skip lines already present), and `**/.github/.qmd-dirty-*` if QMD tracking was installed.
+  Don't edit tracked `.gitignore` files. If the file is already tracked by git, skip that repo and tell the user.
+- Folders in `<ws>` that aren't git repos need nothing.
 
 ## 4. Where the files must NOT go
 - This `<ws>/.github/` is the **workspace-root** folder (the parent of the repos), not inside any repo.
